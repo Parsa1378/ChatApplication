@@ -13,6 +13,10 @@ import java.util.Hashtable;
 
 public class Server {
 
+    public static void main(String[] args) throws IOException {
+        new Server();
+    }
+
     private ServerSocket server;
     private JFrame frame;
     private JTextArea sLabel;

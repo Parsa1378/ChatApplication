@@ -5,6 +5,8 @@ import model.MessageType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,6 +33,10 @@ public class Client {
     private int pNumber;
     private String server;
 
+    public static void main(String[] args) throws IOException{
+        new Client();
+    }
+
     public Client() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -38,7 +44,7 @@ public class Client {
                     startConnection();
                     startChatGUI();
                 } catch(IOException ioe) {
-                    System.out.println("Could't connect to server: " + ioe.getMessage());
+                    System.out.println("Cannot connect to server: " + ioe.getMessage());
                 }
             }
         });
@@ -81,9 +87,9 @@ public class Client {
         frame = new JFrame();
         String str = "";
         String message = "Enter your name to enter the chat:";
-        while(str.isEmpty()) {
-            str = (String)JOptionPane.showInputDialog(frame, message);
-            if(str == null) System.exit(0);
+        while (str.isEmpty()) {
+            str = (String) JOptionPane.showInputDialog(frame, message);
+            if (str == null) System.exit(0);
             message = "Name cannot be empty!\nEnter your name to enter the chat:";
         }
         this.name = str;
@@ -118,18 +124,18 @@ public class Client {
         messageArea = new JScrollPane();
         messageText = new JTextArea();
         sendButton = new JButton("Send");
-        sendButton.setMargin(new Insets(1,1,1,1));
+        sendButton.setMargin(new Insets(1, 1, 1, 1));
 
         /*
          * send the message to all the clients
          */
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if(!messageText.getText().equals("")) {
+                if (!messageText.getText().equals("")) {
                     try {
-                        out.writeObject(new Message(messageText.getText(),MessageType.CLIENT_GLOBAL_MESSAGE));
+                        out.writeObject(new Message(messageText.getText(), MessageType.CLIENT_GLOBAL_MESSAGE));
                         out.flush();
-                    } catch(IOException ioe) {
+                    } catch (IOException ioe) {
                         System.out.println("Error establishing connection: " + ioe.getMessage());
                     }
                     messageText.setText("");
@@ -144,18 +150,18 @@ public class Client {
 
 
         GridBagConstraints gbc = new GridBagConstraints();
-        Insets insets = new Insets(5,5,5,5);
+        Insets insets = new Insets(5, 5, 5, 5);
 
-        addComponent(leftPanel,globalChat, gbc, GridBagConstraints.BOTH, GridBagConstraints.CENTER, 1, 1, 0, 1, 2, 1, insets);
-        addComponent(leftPanel,messageArea, gbc, GridBagConstraints.BOTH, GridBagConstraints.CENTER, 1, 0, 0, 2, 1, 1, insets);
-        addComponent(leftPanel,sendButton, gbc, GridBagConstraints.NONE, GridBagConstraints.CENTER, 0, 0, 1, 2, 1, 1, insets);
+        addComponent(leftPanel, globalChat, gbc, GridBagConstraints.BOTH, GridBagConstraints.CENTER, 1, 1, 0, 1, 2, 1, insets);
+        addComponent(leftPanel, messageArea, gbc, GridBagConstraints.BOTH, GridBagConstraints.CENTER, 1, 0, 0, 2, 1, 1, insets);
+        addComponent(leftPanel, sendButton, gbc, GridBagConstraints.NONE, GridBagConstraints.CENTER, 0, 0, 1, 2, 1, 1, insets);
 
         splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(300);
         splitPane.setLeftComponent(leftPanel);
         splitPane.setRightComponent(rightPanel);
 
-        frame.setPreferredSize(new Dimension(600,400));
+        frame.setPreferredSize(new Dimension(600, 400));
         frame.setLayout(new GridLayout());
         frame.add(splitPane);
         frame.pack();
@@ -163,6 +169,46 @@ public class Client {
         System.out.println("visible");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        out.writeObject(new Message());
+        out.flush();
 
+    }
+
+    public void addComponent(Container parent, Component child, GridBagConstraints gbc, int fill, int anchor, double weightx, double weighty, int gridx, int gridy, int gridwidth, int gridheight, Insets insets) {
+        gbc.fill = fill;
+        gbc.anchor = anchor;
+        gbc.weightx = weightx;
+        gbc.weighty = weighty;
+        gbc.gridx = gridx;
+        gbc.gridy = gridy;
+        gbc.gridwidth = gridwidth;
+        gbc.gridheight = gridheight;
+        gbc.insets = insets;
+        parent.add(child, gbc);
+    }
+
+    public ObjectOutputStream getOut() {
+        return out;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public JPanel getRightPanel() {
+        return rightPanel;
+    }
+
+    public ObjectInputStream getIn() {
+        return in;
+    }
+
+    public JTextArea getGlobalChatArea() {
+        return globalChatArea;
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
 
 }
